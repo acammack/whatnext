@@ -1,0 +1,75 @@
+#!/bin/bash
+
+WN_CONFIG_DIRECTORY=~/.whatnext
+WN_PROJECTS_DIRECTORY=$WN_CONFIG_DIRECTORY/projects
+WN_ACTIVE_DIRECTORY=$WN_CONFIG_DIRECTORY/active-tasks
+WN_STARTED_DIRECTORY=$WN_CONFIG_DIRECTORY/started-tasks
+WN_CURRENT=$WN_CONFIG_DIRECTORY/current
+
+WN_EDITOR=${EDITOR:-nano}
+
+_whatnext_dispatch() {
+  local cmd project task path next
+  local project_dir task_f active_dir active_l
+
+  cmd="${1:-echo}"
+  project="$2"
+  task="$3"
+
+  project_dir=$WN_PROJECTS_DIRECTORY/$project
+  task_f=$project_dir/$task
+
+  active_dir=$WN_ACTIVE_DIRECTORY/$project
+  active_l=$project_dir/$task
+
+  case "$cmd" in
+    add)
+      mkdir -p $project_dir
+      touch $task_f
+      ;;
+    queue)
+      mkdir -p $active_dir
+      ln -s $task_f $active_l
+      ;;
+    start)
+      [ -e "$active_l" ] ||
+        ln -s $task_f $active_l
+      [ -f "$(realpath $WN_CURRENT)" ] &&
+        mv $WN_CURRENT $WN_STARTED_DIRECTORY/$(date "+%Y%d%m%H%M%S")
+      ln -nsf $active_l $WN_CURRENT
+      ;;
+    finish)
+      path=$(realpath $WN_CURRENT)
+      [ -f "$path" ] &&
+        mv $path $(dirname $path)/.$(basename $path)
+
+      next="$(ls $WN_STARTED_DIRECTORY | tail -n 1)"
+
+      [ -n "$next" ] &&
+        mv $WN_STARTED_DIRECTORY/$next $WN_CURRENT &&
+        echo $(realpath $WN_CURRENT)
+      ;;
+    list)
+        ls $WN_ACTIVE_DIRECTORY/*
+      ;;
+    open)
+      [ -f $(realpath $WN_CURRENT) ]
+      [ -f $(realpath $WN_CURRENT) ] &&
+        $WN_EDITOR $WN_CURRENT
+      ;;
+    echo | *)
+      path=$(realpath $WN_CURRENT)
+      [ -f "$path" ] &&
+        echo $path &&
+        cat $path
+  esac
+}
+
+if [ $(basename $0) = "whatnext" ]; then
+  # Ensure directories
+  mkdir -p $WN_ACTIVE_DIRECTORY
+  mkdir -p $WN_PROJECTS_DIRECTORY
+  mkdir -p $WN_STARTED_DIRECTORY
+  
+  _whatnext_dispatch "$@"
+fi
