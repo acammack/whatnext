@@ -15,6 +15,14 @@ _whatnext_open() {
     "$WN_EDITOR" "$task"
 }
 
+_whatnext_ls() {
+  if [ -n "$(ls "$WN_ACTIVE_DIRECTORY")" ]; then
+    ls "$WN_ACTIVE_DIRECTORY"/*;
+  elif [ -n "$(ls "$WN_PROJECTS_DIRECTORY")" ]; then
+    ls "$WN_PROJECTS_DIRECTORY"/*;
+  fi
+}
+
 _whatnext_dispatch() {
   local cmd project task path next postponed active_project
   local project_dir task_f active_dir active_l
@@ -76,11 +84,7 @@ _whatnext_dispatch() {
       fi
       ;;
     ls)
-      if [ -n "$(ls "$WN_ACTIVE_DIRECTORY")" ]; then
-        ls "$WN_ACTIVE_DIRECTORY"/*;
-      elif [ -n "$(ls "$WN_PROJECTS_DIRECTORY")" ]; then
-        ls "$WN_PROJECTS_DIRECTORY"/*;
-      fi
+      _whatnext_ls
       ;;
     open)
       _whatnext_open
@@ -89,9 +93,13 @@ _whatnext_dispatch() {
       tree -a "$WN_CONFIG_DIRECTORY"
       ;;
     echo | *)
-      [ -f "$path" ] &&
-        echo "$path" &&
-        cat "$path"
+      if [ -f "$path" ]; then
+        echo "$path"
+        cat "$path";
+      else
+        echo "What's next?" $'\n'
+        _whatnext_ls
+      fi
   esac
 }
 
