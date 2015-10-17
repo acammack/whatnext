@@ -35,7 +35,8 @@ _whatnext_dispatch() {
       ;;
     start)
       [ -e "$active_l" ] ||
-        ln -s $task_f $active_l
+        # If it's already queued, don't panic
+        ln -sf $task_f $active_l
       [ -f "$(realpath $WN_CURRENT)" ] &&
         mv $WN_CURRENT $WN_STARTED_DIRECTORY/$(date "+%Y%d%m%H%M%S")
       ln -nsf $active_l $WN_CURRENT

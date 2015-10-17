@@ -23,7 +23,11 @@ _whatnext() {
           COMPREPLY=( $( compgen -W "$(ls $WN_PROJECTS_DIRECTORY/$project)" -- $cur ) )
           ;;
         start)
-          COMPREPLY=( $( compgen -W "$(ls $WN_ACTIVE_DIRECTORY/$project)" -- $cur ) )
+          COMPREPLY=()
+          [ -d "$WN_PROJECTS_DIRECTORY/$project" ] &&
+            COMPREPLY=( $( compgen -W "$(ls $WN_PROJECTS_DIRECTORY/$project)" -- $cur ) )
+          [ -d "$WN_ACTIVE_DIRECTORY/$project" ] &&
+            COMPREPLY=( $( compgen -W "$(ls $WN_ACTIVE_DIRECTORY/$project) $(ls $WN_PROJECTS_DIRECTORY/$project)" -- $cur ) )
           ;;
         *) COMPREPLY=()
       esac
