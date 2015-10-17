@@ -1,12 +1,17 @@
 #!/bin/bash
 
 # Edit these to change where your tasks live
-WN_CONFIG_DIRECTORY=~/.whatnext
-WN_PROJECTS_DIRECTORY=$WN_CONFIG_DIRECTORY/projects
-WN_ACTIVE_DIRECTORY=$WN_CONFIG_DIRECTORY/active-tasks
-WN_CURRENT=$WN_CONFIG_DIRECTORY/current
+WN_CONFIG_DIRECTORY="$HOME/.whatnext"
+WN_PROJECTS_DIRECTORY="$WN_CONFIG_DIRECTORY/projects"
+WN_ACTIVE_DIRECTORY="$WN_CONFIG_DIRECTORY/active-tasks"
+WN_CURRENT="$WN_CONFIG_DIRECTORY/current"
 
-WN_EDITOR=${EDITOR:-nano}
+WN_EDITOR="${EDITOR:-nano}"
+
+_whatnext_open() {
+  [ -f $(realpath "$WN_CURRENT") ] &&
+    "$WN_EDITOR" "$WN_CURRENT"
+}
 
 _whatnext_dispatch() {
   local cmd project task path next postponed active_project
@@ -17,60 +22,80 @@ _whatnext_dispatch() {
   project="$2"
   task="$3"
 
-  project_dir=$WN_PROJECTS_DIRECTORY/$project
-  task_f=$project_dir/$task
+  [ -h "$WN_CURRENT" ] &&
+    path="$(realpath $WN_CURRENT)"
 
-  active_dir=$WN_ACTIVE_DIRECTORY/$project
-  active_l=$active_dir/$task
+  project_dir="$WN_PROJECTS_DIRECTORY/$project"
+  task_f="$project_dir/$task"
+
+  active_dir="$WN_ACTIVE_DIRECTORY/$project"
+  active_l="$active_dir/$task"
 
   case "$cmd" in
     add)
-      mkdir -p $project_dir
-      touch $task_f
+      mkdir -p "$project_dir"
+      touch "$task_f"
       ;;
     queue)
-      mkdir -p $active_dir
-      ln -s $task_f $active_l
+      mkdir -p "$active_dir"
+      ln -nsf "$task_f" "$active_l"
       ;;
     start)
-      mkdir -p $active_dir
-      ln -s $task_f $active_l
-      ln -nsf $active_l $WN_CURRENT
+      mkdir -p "$active_dir"
+      ln -nsf "$task_f" "$active_l"
+      ln -nsf "$active_l" "$WN_CURRENT"
+      _whatnext_open
       ;;
     finish)
-      path=$(realpath $WN_CURRENT)
-      active_project=$(dirname $(readlink $WN_CURRENT ))
+      _whatnext_open
+      active_project="$(dirname $(readlink "$WN_CURRENT" ))"
       # Hide the underlying issue
       [ -f "$path" ] &&
-        mv $path $(dirname $path)/.$(basename $path)
+        mv "$path" "$(dirname "$path")/.$(basename "$path")"
+
       # Remove it from the active list
-      rm $(readlink $WN_CURRENT)
+      rm "$(readlink "$WN_CURRENT")"
       rm $WN_CURRENT
+
       # Remove the project from active if no tasks are left
-      rmdir --ignore-fail-on-non-empty $active_project
+      rmdir --ignore-fail-on-non-empty "$active_project"
 
-      ls $WN_ACTIVE_DIRECTORY/*
-
+      # Print the remaining queued issues for the user to do
+      # (Starting from the last project, if there are more)
+      if [ -d "$active_project" ]; then
+        echo "What's next?\n"
+        echo "$(basename "$active_project"):\n"
+        ls "$active_project";
+      else
+        echo "What's next?\n"
+        [ -n "$(ls "$WN_ACTIVE_DIRECTORY")" ] &&
+          ls "$WN_ACTIVE_DIRECTORY"/*;
+      fi
       ;;
-    list)
-        ls $WN_ACTIVE_DIRECTORY/*
+    ls)
+      if [ -n "$(ls "$WN_ACTIVE_DIRECTORY")" ]; then
+        ls "$WN_ACTIVE_DIRECTORY"/*;
+      elif [ -n "$(ls "$WN_PROJECTS_DIRECTORY")" ]; then
+        ls "$WN_PROJECTS_DIRECTORY"/*;
+      fi
       ;;
     open)
-      [ -f $(realpath $WN_CURRENT) ] &&
-        $WN_EDITOR $WN_CURRENT
+      _whatnext_open
+      ;;
+    tree) # Requires tree to be installed, shows the whole state
+      tree -a "$WN_CONFIG_DIRECTORY"
       ;;
     echo | *)
-      path=$(realpath $WN_CURRENT)
       [ -f "$path" ] &&
-        echo $path &&
-        cat $path
+        echo "$path" &&
+        cat "$path"
   esac
 }
 
-if [ $(basename $0) = "whatnext" ]; then
+if [ $(basename "$0") = "whatnext" ]; then
   # Ensure directories
-  mkdir -p $WN_ACTIVE_DIRECTORY
-  mkdir -p $WN_PROJECTS_DIRECTORY
+  mkdir -p "$WN_ACTIVE_DIRECTORY"
+  mkdir -p "$WN_PROJECTS_DIRECTORY"
   
   _whatnext_dispatch "$@"
 fi
