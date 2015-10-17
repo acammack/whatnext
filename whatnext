@@ -51,7 +51,6 @@ _whatnext_dispatch() {
       rm $(readlink $WN_CURRENT)
       rm $WN_CURRENT
       # Remove the project from active if no tasks are left
-      echo $active_project
       rmdir --ignore-fail-on-non-empty $active_project
 
       # Get the most recent postponed item and select it, if it exists
