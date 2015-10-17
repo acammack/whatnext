@@ -9,8 +9,10 @@ WN_CURRENT="$WN_CONFIG_DIRECTORY/current"
 WN_EDITOR="${EDITOR:-nano}"
 
 _whatnext_open() {
-  [ -f $(realpath "$WN_CURRENT") ] &&
-    "$WN_EDITOR" "$WN_CURRENT"
+  local task
+  task=${1:-"$WN_CURRENT"}
+  [ -f $(realpath "$task") ] &&
+    "$WN_EDITOR" "$task"
 }
 
 _whatnext_dispatch() {
@@ -35,6 +37,7 @@ _whatnext_dispatch() {
     add)
       mkdir -p "$project_dir"
       touch "$task_f"
+      _whatnext_open "$task_f"
       ;;
     queue)
       mkdir -p "$active_dir"
@@ -63,11 +66,11 @@ _whatnext_dispatch() {
       # Print the remaining queued issues for the user to do
       # (Starting from the last project, if there are more)
       if [ -d "$active_project" ]; then
-        echo "What's next?\n"
-        echo "$(basename "$active_project"):\n"
+        echo "What's next?" $'\n'
+        echo "$(basename "$active_project"):" $'\n'
         ls "$active_project";
       else
-        echo "What's next?\n"
+        echo "What's next?" $'\n'
         [ -n "$(ls "$WN_ACTIVE_DIRECTORY")" ] &&
           ls "$WN_ACTIVE_DIRECTORY"/*;
       fi
