@@ -4,7 +4,6 @@
 WN_CONFIG_DIRECTORY=~/.whatnext
 WN_PROJECTS_DIRECTORY=$WN_CONFIG_DIRECTORY/projects
 WN_ACTIVE_DIRECTORY=$WN_CONFIG_DIRECTORY/active-tasks
-WN_STARTED_DIRECTORY=$WN_CONFIG_DIRECTORY/started-tasks
 WN_CURRENT=$WN_CONFIG_DIRECTORY/current
 
 WN_EDITOR=${EDITOR:-nano}
@@ -34,11 +33,8 @@ _whatnext_dispatch() {
       ln -s $task_f $active_l
       ;;
     start)
-      [ -e "$active_l" ] ||
-        # If it's already queued, don't panic
-        ln -sf $task_f $active_l
-      [ -f "$(realpath $WN_CURRENT)" ] &&
-        mv $WN_CURRENT $WN_STARTED_DIRECTORY/$(date "+%Y%d%m%H%M%S")
+      mkdir -p $active_dir
+      ln -s $task_f $active_l
       ln -nsf $active_l $WN_CURRENT
       ;;
     finish)
@@ -53,30 +49,13 @@ _whatnext_dispatch() {
       # Remove the project from active if no tasks are left
       rmdir --ignore-fail-on-non-empty $active_project
 
-      # Get the most recent postponed item and select it, if it exists
-      postponed="$(ls $WN_STARTED_DIRECTORY | head -n 1)"
-      [ -n "$postponed" ] && 
-        mv $WN_STARTED_DIRECTORY/$postponed $WN_CURRENT &&
-        echo $(realpath $WN_CURRENT)
+      ls $WN_ACTIVE_DIRECTORY/*
 
-      # If there aren't any postponed ones, grab one from the active list
-      # (Starting from the last project, if there are more)
-      [ -z "$postponed" ] &&
-        [ -d "$active_project" ] &&
-        next=$(find $active_project -type l | head -n 1)
-
-      [ -z "$next" ] &&
-        next=$(find $WN_ACTIVE_DIRECTORY -type l | head -n 1)
-
-      [ -n "$next" ] &&
-        ln -ns $next $WN_CURRENT &&
-        echo $(realpath $WN_CURRENT)
       ;;
     list)
         ls $WN_ACTIVE_DIRECTORY/*
       ;;
     open)
-      [ -f $(realpath $WN_CURRENT) ]
       [ -f $(realpath $WN_CURRENT) ] &&
         $WN_EDITOR $WN_CURRENT
       ;;
@@ -92,7 +71,6 @@ if [ $(basename $0) = "whatnext" ]; then
   # Ensure directories
   mkdir -p $WN_ACTIVE_DIRECTORY
   mkdir -p $WN_PROJECTS_DIRECTORY
-  mkdir -p $WN_STARTED_DIRECTORY
   
   _whatnext_dispatch "$@"
 fi
