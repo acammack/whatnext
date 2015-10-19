@@ -58,7 +58,7 @@ _whatnext_dispatch() {
       ln -nsf "$task_f" "$active_l"
       ;;
     start)
-      [ -a "$active_l" ] || echo "That task is not in your queue" 1>&2 && return 1
+      [ -a "$active_l" ] || ( echo "That task is not in your queue" 1>&2 && return 1 )
       ln -nsf "$active_l" "$WN_CURRENT"
       _whatnext_open
       ;;
