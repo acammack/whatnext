@@ -12,7 +12,7 @@ _whatnext() {
 
   case $COMP_CWORD in
     1)
-      COMPREPLY=( $( compgen -W 'add queue start finish tree ls open echo' -- "$cur" ) )
+      COMPREPLY=( $( compgen -W 'add queue start finish open ls tree echo' -- "$cur" ) )
       ;;
     2)
       COMPREPLY=( $( compgen -W "$(ls --quoting-style=escape "$WN_PROJECTS_DIRECTORY")" -- "$cur" ) )

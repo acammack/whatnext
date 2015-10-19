@@ -88,11 +88,11 @@ _whatnext_dispatch() {
           ls "$WN_ACTIVE_DIRECTORY"/*;
       fi
       ;;
-    ls)
-      _whatnext_ls
-      ;;
     open)
       _whatnext_open
+      ;;
+    ls)
+      _whatnext_ls
       ;;
     tree) # Requires tree to be installed, shows the whole state
       tree -a "$WN_CONFIG_DIRECTORY"
