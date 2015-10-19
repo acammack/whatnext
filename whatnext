@@ -10,8 +10,8 @@ WN_EDITOR="${EDITOR:-nano}"
 
 _whatnext_open() {
   local task
-  task=${1:-"$WN_CURRENT"}
-  [ -f $(realpath "$task") ] &&
+  task="${1:-"$WN_CURRENT"}"
+  [ -a "$(realpath "$task")" ] &&
     "$WN_EDITOR" "$task"
 }
 
@@ -21,6 +21,12 @@ _whatnext_ls() {
   elif [ -n "$(ls "$WN_PROJECTS_DIRECTORY")" ]; then
     ls "$WN_PROJECTS_DIRECTORY"/*;
   fi
+}
+
+_whatnext_add() {
+  mkdir -p "$1"
+  touch "$2"
+  _whatnext_open "$2"
 }
 
 _whatnext_dispatch() {
@@ -43,17 +49,16 @@ _whatnext_dispatch() {
 
   case "$cmd" in
     add)
-      mkdir -p "$project_dir"
-      touch "$task_f"
-      _whatnext_open "$task_f"
+      _whatnext_add "$project_dir" "$task_f"
       ;;
     queue)
+      [ -a "$task_f" ] ||
+        _whatnext_add "$project_dir" "$task_f"
       mkdir -p "$active_dir"
       ln -nsf "$task_f" "$active_l"
       ;;
     start)
-      mkdir -p "$active_dir"
-      ln -nsf "$task_f" "$active_l"
+      [ -a "$active_l" ] || echo "That task is not in your queue" 1>&2 && return 1
       ln -nsf "$active_l" "$WN_CURRENT"
       _whatnext_open
       ;;
@@ -61,7 +66,7 @@ _whatnext_dispatch() {
       _whatnext_open
       active_project="$(dirname $(readlink "$WN_CURRENT" ))"
       # Hide the underlying issue
-      [ -f "$path" ] &&
+      [ -a "$path" ] &&
         mv "$path" "$(dirname "$path")/.$(basename "$path")"
 
       # Remove it from the active list
@@ -93,7 +98,7 @@ _whatnext_dispatch() {
       tree -a "$WN_CONFIG_DIRECTORY"
       ;;
     echo | *)
-      if [ -f "$path" ]; then
+      if [ -a "$path" ]; then
         echo "$path"
         cat "$path";
       else

@@ -3,7 +3,7 @@
 source whatnext
 
 _whatnext() {
-  local cur action project
+  local cur action project project_dir active_dir
 
   COMPREPLY=()
   cur=${COMP_WORDS[COMP_CWORD]}
@@ -15,20 +15,39 @@ _whatnext() {
       COMPREPLY=( $( compgen -W 'add queue start finish tree ls open echo' -- "$cur" ) )
       ;;
     2)
-      COMPREPLY=( $( compgen -W "$(ls "$WN_PROJECTS_DIRECTORY")" -- "$cur" ) )
+      COMPREPLY=( $( compgen -W "$(ls --quoting-style=escape "$WN_PROJECTS_DIRECTORY")" -- "$cur" ) )
       ;;
     3)
+      project_dir="$WN_PROJECTS_DIRECTORY/$project"
+      active_dir="$WN_ACTIVE_DIRECTORY/$project"
       case "$action" in
         queue)
-          COMPREPLY=( $( compgen -W "$(ls "$WN_PROJECTS_DIRECTORY/$project")" -- "$cur" ) )
+          pushd $project_dir >/dev/null
+          # From the bash-completion package
+          _filedir
+          popd >/dev/null
+          if [ ! "." == "${cur:0:1}" ]; then
+            # For some reason ${array[@]//.*/} doesn't work here
+            local x
+            for x in "${!COMPREPLY[@]}"; do
+              local d="${COMPREPLY[$x]}"
+              if [ "." == "${d:0:1}" ]; then
+                unset COMPREPLY[$x]
+              fi
+            done
+          fi
           ;;
         start)
-          COMPREPLY=()
-          [ -d "$WN_PROJECTS_DIRECTORY/$project" ] &&
-            COMPREPLY=( $( compgen -W "$(ls "$WN_PROJECTS_DIRECTORY/$project")" -- "$cur" ) )
-          [ -d "$WN_ACTIVE_DIRECTORY/$project" ] &&
-            COMPREPLY=( $( compgen -W "$(ls "$WN_ACTIVE_DIRECTORY/$project") $(ls "$WN_PROJECTS_DIRECTORY/$project")" -- "$cur" ) )
+          pushd $active_dir >/dev/null
+          # From the bash-completion package
+          _filedir
+          popd >/dev/null
           ;;
+        open)
+          pushd $project_dir >/dev/null
+          # From the bash-completion package
+          _filedir
+          popd >/dev/null
         *) COMPREPLY=()
       esac
       ;;
@@ -37,4 +56,4 @@ _whatnext() {
 
 }
 
-complete -o filenames -F _whatnext whatnext
+complete -F _whatnext whatnext
