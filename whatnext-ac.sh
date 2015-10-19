@@ -48,6 +48,7 @@ _whatnext() {
           # From the bash-completion package
           _filedir
           popd >/dev/null
+          ;;
         *) COMPREPLY=()
       esac
       ;;
