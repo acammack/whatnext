@@ -17,7 +17,7 @@ _whatnext_open() {
 
 _whatnext_ls() {
   if [ -n "$(ls "$WN_ACTIVE_DIRECTORY")" ]; then
-    ls "$WN_ACTIVE_DIRECTORY"/*;
+    ls -A "$WN_ACTIVE_DIRECTORY"/*;
   elif [ -n "$(ls "$WN_PROJECTS_DIRECTORY")" ]; then
     ls "$WN_PROJECTS_DIRECTORY"/*;
   fi
@@ -85,7 +85,7 @@ _whatnext_dispatch() {
       else
         echo "What's next?" $'\n'
         [ -n "$(ls "$WN_ACTIVE_DIRECTORY")" ] &&
-          ls "$WN_ACTIVE_DIRECTORY"/*;
+          ls -A "$WN_ACTIVE_DIRECTORY"/*;
       fi
       ;;
     open)
