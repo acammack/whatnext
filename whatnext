@@ -100,6 +100,11 @@ _whatnext_dispatch() {
     tree) # Requires tree to be installed, shows the whole state
       tree -a "$WN_CONFIG_DIRECTORY"
       ;;
+    grep)
+      shift 2 # Everything after the project name is fed to grep
+      ls -A "$project_dir" | grep "$@" | xargs -I '{}' echo "$project_dir"/'{}'
+      grep -R "$@" "$project_dir"
+      ;;
     echo | *)
       if [ -a "$path" ]; then
         echo "$path"

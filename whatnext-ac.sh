@@ -36,7 +36,7 @@ _whatnext() {
 
   case $COMP_CWORD in
     1)
-      COMPREPLY=( $( compgen -W 'add queue start finish open ls tree echo' -- "$cur" ) )
+      COMPREPLY=( $( compgen -W 'add queue start finish open ls tree grep echo' -- "$cur" ) )
       ;;
     2)
       _whatnext_file_search $WN_PROJECTS_DIRECTORY

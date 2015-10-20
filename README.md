@@ -69,6 +69,12 @@ whatnext tree
 Runs `tree` on the whatnext directory for examination. Requires the `tree`
 program to be installed.
 
+```
+whatnext grep <project> [options] <pattern>
+```
+Searches through the project for files with names or contents matching
+`<pattern>`. Any options provided are passed straight through to `grep`.
+
 Installation
 ------------
 
