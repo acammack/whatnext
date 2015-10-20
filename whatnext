@@ -8,6 +8,8 @@ WN_CURRENT="$WN_CONFIG_DIRECTORY/current"
 
 WN_EDITOR="${EDITOR:-nano}"
 
+set -e
+
 _whatnext_open() {
   local task
   task="${1:-"$WN_CURRENT"}"
@@ -24,6 +26,7 @@ _whatnext_ls() {
 }
 
 _whatnext_add() {
+  [ -a "$2" ] && echo "That task already exists" 1>&2 && return 1
   mkdir -p "$1"
   touch "$2"
   _whatnext_open "$2"
@@ -67,7 +70,7 @@ _whatnext_dispatch() {
       active_project="$(dirname $(readlink "$WN_CURRENT" ))"
       # Hide the underlying issue
       [ -a "$path" ] &&
-        mv "$path" "$(dirname "$path")/.$(basename "$path")"
+        mv -n "$path" "$(dirname "$path")/.$(basename "$path")"
 
       # Remove it from the active list
       rm "$(readlink "$WN_CURRENT")"
