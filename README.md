@@ -73,7 +73,7 @@ Installation
 ------------
 
 Put the `whatnext` file somewhere in your path, make it executable, and source
-the `whatnext-ac` file in your `.bashrc` if you want tab completion (requires
-bash-completion to be installed). Alias `whatnext` to `wn` for even more speed
-(be sure to add `complete -F _whatnext wn` to your `.bashrc` if you don't want
-to lose tab completion).
+the `whatnext-ac.sh` file in your `.bashrc` if you want tab completion
+(requires bash-completion to be installed). Alias `whatnext` to `wn` for even
+more speed (be sure to add `complete -F _whatnext wn` to your `.bashrc` if you
+don't want to lose tab completion).
