@@ -79,14 +79,12 @@ _whatnext_dispatch() {
 
       # Print the remaining queued issues for the user to do
       # (Starting from the last project, if there are more)
+      echo "What's next?" $'\n'
       if [ -d "$active_project" ]; then
-        echo "What's next?" $'\n'
         echo "$(basename "$active_project"):" $'\n'
-        ls "$active_project";
+        ls -A "$active_project";
       else
-        echo "What's next?" $'\n'
-        [ -n "$(ls "$WN_ACTIVE_DIRECTORY")" ] &&
-          ls -A "$WN_ACTIVE_DIRECTORY"/*;
+        _whatnext_ls
       fi
       ;;
     open)

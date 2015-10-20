@@ -41,7 +41,9 @@ whatnext finish
 ```
 Marks a task as complete and opens the underlying file for editing. This
 removes it from the queue and prepends a `.` to underlying file so it is does
-not clutter up the output of other commands (unless you are looking for it).
+not clutter up the output of other commands (unless you are looking for it). It
+then prompts you to select another task (starting with the project you were
+working on).
 
 ```
 whatnext open [<project> <task_name>]
