@@ -46,8 +46,8 @@ not clutter up the output of other commands (unless you are looking for it).
 ```
 whatnext open [<project> <task_name>]
 ```
-Opens the underlying file for editing. It defaults to the current task if none
-is specified.
+Opens the underlying file for editing. It defaults to the current task if not
+specified.
 
 ```
 whatnext ls
@@ -60,3 +60,10 @@ whatnext tree
 ```
 Runs `tree` on the whatnext directory for examination. Requires the `tree`
 program to be installed.
+
+Installation
+------------
+
+Put the `whatnext` file somewhere in your path, make it executable, and source
+the `whatnext-ac` file in your `.bashrc` if you want tab completion (requires
+bash-completion to be installed). Alias `whatnext` to `wn` for even more speed.
