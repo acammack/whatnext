@@ -9,10 +9,8 @@ WN_CURRENT="$WN_CONFIG_DIRECTORY/current"
 WN_EDITOR="${EDITOR:-nano}"
 
 _whatnext_open() {
-  local task
-  task="${1:-"$WN_CURRENT"}"
-  [ -a "$(realpath "$task")" ] &&
-    "$WN_EDITOR" "$task"
+  [ -r "$(realpath "$1")" ] &&
+    "$WN_EDITOR" "$1"
 }
 
 _whatnext_ls() {
@@ -61,10 +59,10 @@ _whatnext_dispatch() {
     start)
       [ -a "$active_l" ] || ( echo "That task is not in your queue" 1>&2 && return 1 )
       ln -nsf "$active_l" "$WN_CURRENT"
-      _whatnext_open
+      _whatnext_open "$(readlink "$(readlink "$WN_CURRENT")")"
       ;;
     finish)
-      _whatnext_open
+      _whatnext_open "$(readlink "$(readlink "$WN_CURRENT")")"
       active_project="$(dirname $(readlink "$WN_CURRENT" ))"
       # Hide the underlying issue
       [ -a "$path" ] &&
@@ -91,7 +89,7 @@ _whatnext_dispatch() {
       if [ -r "$task_f" ] && [ ! -d "$task_f" ]; then
         _whatnext_open "$task_f";
       else
-        _whatnext_open
+        _whatnext_open "$(readlink "$(readlink "$WN_CURRENT")")"
       fi
       ;;
     ls)
