@@ -6,6 +6,12 @@ over the file system designed for use from the command line or in scripts.
 Combined with source control, it allows for powerful tracking of what you
 should do next.
 
+Each task is a file on your computer. Task requirements, notes, completion
+estimates, and deadlines can go there, but `whatnext` doesn't care. These files
+are grouped together into folders called projects. Managing a project as a git
+repository allows for collaboration and history control beyond most dedicated
+task management systems.
+
 Usage
 -----
 
