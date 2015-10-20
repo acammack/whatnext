@@ -8,8 +8,6 @@ WN_CURRENT="$WN_CONFIG_DIRECTORY/current"
 
 WN_EDITOR="${EDITOR:-nano}"
 
-set -e
-
 _whatnext_open() {
   local task
   task="${1:-"$WN_CURRENT"}"
@@ -112,6 +110,8 @@ _whatnext_dispatch() {
 }
 
 if [ $(basename "$0") = "whatnext" ]; then
+  set -e
+
   # Ensure directories
   mkdir -p "$WN_ACTIVE_DIRECTORY"
   mkdir -p "$WN_PROJECTS_DIRECTORY"
