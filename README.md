@@ -40,8 +40,8 @@ remain in the queue until they are complete and can be preempted at any time.
 whatnext finish
 ```
 Marks a task as complete and opens the underlying file for editing. This
-removes it from the queue and renames the underlying file with a `.` at the
-front, so it is does not clutter up searches (unless you are looking for it)
+removes it from the queue and prepends a `.` to underlying file so it is does
+not clutter up the output of other commands (unless you are looking for it).
 
 ```
 whatnext open [<project> <task_name>]
