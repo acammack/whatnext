@@ -63,14 +63,14 @@ _whatnext_dispatch() {
       ;;
     finish)
       _whatnext_open "$(readlink "$(readlink "$WN_CURRENT")")"
-      active_project="$(dirname $(readlink "$WN_CURRENT" ))"
+      active_project="$(dirname "$(readlink "$WN_CURRENT")")"
       # Hide the underlying issue
       [ -a "$path" ] &&
         mv -n "$path" "$(dirname "$path")/.$(basename "$path")"
 
       # Remove it from the active list
       rm "$(readlink "$WN_CURRENT")"
-      rm $WN_CURRENT
+      rm "$WN_CURRENT"
 
       # Remove the project from active if no tasks are left
       rmdir --ignore-fail-on-non-empty "$active_project"
