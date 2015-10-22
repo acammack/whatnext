@@ -9,7 +9,7 @@ WN_CURRENT="$WN_CONFIG_DIRECTORY/current"
 WN_EDITOR="${EDITOR:-nano}"
 
 _whatnext_open() {
-  [ -r "$(realpath "$1")" ] &&
+  [ -r "$1" ] && [ ! -d "$1" ] &&
     "$WN_EDITOR" "$1"
 }
 
@@ -22,7 +22,7 @@ _whatnext_ls() {
 }
 
 _whatnext_add() {
-  [ -a "$2" ] && echo "That task already exists" 1>&2 && return 1
+  [ -e "$2" ] && echo "That task already exists" 1>&2 && return 1
   mkdir -p "$1"
   touch "$2"
   _whatnext_open "$2"
@@ -38,7 +38,7 @@ _whatnext_dispatch() {
   task="$3"
 
   [ -h "$WN_CURRENT" ] &&
-    path="$(realpath $WN_CURRENT)"
+    path="$(readlink "$(readlink "$WN_CURRENT")")"
 
   project_dir="$WN_PROJECTS_DIRECTORY/$project"
   task_f="$project_dir/$task"
@@ -51,21 +51,21 @@ _whatnext_dispatch() {
       _whatnext_add "$project_dir" "$task_f"
       ;;
     queue)
-      [ -a "$task_f" ] ||
+      [ -e "$task_f" ] ||
         _whatnext_add "$project_dir" "$task_f"
       mkdir -p "$active_dir"
       ln -nsf "$task_f" "$active_l"
       ;;
     start)
-      [ -a "$active_l" ] || ( echo "That task is not in your queue" 1>&2 && return 1 )
+      [ -e "$active_l" ] || ( echo "That task is not in your queue" 1>&2 && return 1 )
       ln -nsf "$active_l" "$WN_CURRENT"
-      _whatnext_open "$(readlink "$(readlink "$WN_CURRENT")")"
+      _whatnext_open "$path"
       ;;
     finish)
-      _whatnext_open "$(readlink "$(readlink "$WN_CURRENT")")"
-      active_project="$(dirname "$(readlink "$WN_CURRENT")")"
+      _whatnext_open "$path"
+      active_project="$(dirname "$path")"
       # Hide the underlying issue
-      [ -a "$path" ] &&
+      [ -e "$path" ] &&
         mv -n "$path" "$(dirname "$path")/.$(basename "$path")"
 
       # Remove it from the active list
@@ -86,10 +86,10 @@ _whatnext_dispatch() {
       fi
       ;;
     open)
-      if [ -r "$task_f" ] && [ ! -d "$task_f" ]; then
+      if [ -n "$task" ]; then
         _whatnext_open "$task_f";
       else
-        _whatnext_open "$(readlink "$(readlink "$WN_CURRENT")")"
+        _whatnext_open "$path"
       fi
       ;;
     ls)
@@ -104,7 +104,7 @@ _whatnext_dispatch() {
       grep -R "$@" "$project_dir"
       ;;
     echo | *)
-      if [ -a "$path" ]; then
+      if [ -r "$path" ]; then
         echo "$path"
         cat "$path";
       else
