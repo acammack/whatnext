@@ -59,7 +59,7 @@ _whatnext_dispatch() {
     start)
       [ -e "$active_l" ] || ( echo "That task is not in your queue" 1>&2 && return 1 )
       ln -nsf "$active_l" "$WN_CURRENT"
-      _whatnext_open "$path"
+      _whatnext_open "$task_f"
       ;;
     finish)
       _whatnext_open "$path"
