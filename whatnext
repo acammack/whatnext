@@ -29,7 +29,7 @@ _whatnext_add() {
 }
 
 _whatnext_dispatch() {
-  local cmd project task path next postponed active_project
+  local cmd project task path next postponed
   local project_dir task_f active_dir active_l
 
   # Name the parameters
@@ -62,8 +62,10 @@ _whatnext_dispatch() {
       _whatnext_open "$task_f"
       ;;
     finish)
+      project="$(basename "$(dirname "$path")")"
+      active_dir="$WN_ACTIVE_DIRECTORY/$project"
+
       _whatnext_open "$path"
-      active_project="$(dirname "$path")"
       # Hide the underlying issue
       [ -e "$path" ] &&
         mv -n "$path" "$(dirname "$path")/.$(basename "$path")"
@@ -73,14 +75,14 @@ _whatnext_dispatch() {
       rm "$WN_CURRENT"
 
       # Remove the project from active if no tasks are left
-      rmdir --ignore-fail-on-non-empty "$active_project"
+      rmdir --ignore-fail-on-non-empty "$active_dir"
 
       # Print the remaining queued issues for the user to do
       # (Starting from the last project, if there are more)
       echo "What's next?" $'\n'
-      if [ -d "$active_project" ]; then
-        echo "$(basename "$active_project"):" $'\n'
-        ls -A "$active_project";
+      if [ -d "$active_dir" ]; then
+        echo "$(basename "$active_dir"):" $'\n'
+        ls -A "$active_dir";
       else
         _whatnext_ls
       fi
