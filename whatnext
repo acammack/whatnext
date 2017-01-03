@@ -116,7 +116,7 @@ _whatnext_dispatch() {
   esac
 }
 
-if [ $(basename "$0") = "whatnext" ]; then
+if [ $(basename -- "$0") = "whatnext" ]; then
   set -e
 
   # Ensure directories
