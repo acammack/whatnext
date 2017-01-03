@@ -122,6 +122,6 @@ if [ $(basename -- "$0") = "whatnext" ]; then
   # Ensure directories
   mkdir -p "$WN_ACTIVE_DIRECTORY"
   mkdir -p "$WN_PROJECTS_DIRECTORY"
-  
+
   _whatnext_dispatch "$@"
 fi
